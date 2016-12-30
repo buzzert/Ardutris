@@ -22,6 +22,36 @@ static tetromino_t LeftLBlock = {
     .shape_data = "x x xx"
 };
 
+static tetromino_t RightLBlock = {
+    .cols = 2,
+    .rows = 3,
+    .shape_data = " x x xx"
+};
+
+static tetromino_t LongBlock = {
+    .cols = 1,
+    .rows = 4,
+    .shape_data = "xxxx"
+};
+
+static tetromino_t MountainBlock = {
+    .cols = 3,
+    .rows = 2,
+    .shape_data = " x xxx"
+};
+
+static tetromino_t ZBlock = {
+    .cols = 3,
+    .rows = 2,
+    .shape_data = "xx xxx"
+};
+
+static tetromino_t SBlock = {
+    .cols = 3,
+    .rows = 2,
+    .shape_data = " xxxx "
+};
+
 typedef struct
 {
     int16_t x;
