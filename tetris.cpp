@@ -1,72 +1,24 @@
 #include <Arduboy.h>
 
 #include "shapes.h"
-
-#define BLACK 0
-#define WHITE 1
-
-#define SHAPE_BLOCK_PADDING 1
-#define SHAPE_BLOCK_WIDTH 3
-
-#define GRID_ROWS 15
-#define GRID_COLS 16
-#define GRID_SIZE (GRID_ROWS * GRID_COLS)
+#include "grid.h"
+#include "input_handler.h"
 
 using namespace std;
 
 static Arduboy arduboy;
 
 static shape_actor current_actor;
-static bool        the_grid[GRID_SIZE];
+static Grid grid;
 
 static unsigned long time_started;
 static unsigned long last_update;
 
 static unsigned long block_speed = 1;
 
-void draw_grid(bool grid[GRID_SIZE], int16_t x, int16_t y)
-{
-    const int16_t frame_width = 1;
-
-    int16_t x_offset = x + frame_width;
-    int16_t y_offset = y + frame_width;
-
-    bool *grid_ptr = grid;
-    for (unsigned int row = 0; row < GRID_ROWS; row++) {
-        for (unsigned int col = 0; col < GRID_COLS; col++) {
-            if (grid[(row * GRID_COLS) + col]) {
-                arduboy.fillRect(x_offset, y_offset, SHAPE_BLOCK_WIDTH, SHAPE_BLOCK_WIDTH, BLACK);
-            }
-
-            x_offset += SHAPE_BLOCK_WIDTH + SHAPE_BLOCK_PADDING;
-        }
-
-        y_offset += SHAPE_BLOCK_WIDTH + SHAPE_BLOCK_PADDING;
-        x_offset = x + frame_width;
-    }
-
-    // Frame
-    arduboy.drawRect(x, y,
-        GRID_COLS * (SHAPE_BLOCK_WIDTH + SHAPE_BLOCK_PADDING) + 1,
-        GRID_ROWS * (SHAPE_BLOCK_WIDTH + SHAPE_BLOCK_PADDING) + 1,
-        BLACK
-    );
-}
-
 void update(unsigned long dt)
 {
     unsigned long now = millis();
-
-    static unsigned long last_input_register = 0;
-    bool debounced = (now - last_input_register) > 200;
-    if (arduboy.pressed(LEFT_BUTTON) && debounced) {
-        current_actor.position.x -= 1;
-        last_input_register = now;
-    } else if (arduboy.pressed(RIGHT_BUTTON) && debounced) {
-        current_actor.position.x += 1;
-        last_input_register = now;
-    }
-
     static unsigned long last_movement = 0;
     if ( (now - last_movement) > (1000 / block_speed) ) {
         // Every second, move interactive actor down by one block
@@ -83,6 +35,7 @@ void draw(unsigned long dt)
     arduboy.clear();
     arduboy.fillScreen(WHITE);
 
+    /*
     bool display_grid[GRID_SIZE];
     memcpy(&display_grid, &the_grid, GRID_SIZE);
 
@@ -98,7 +51,9 @@ void draw(unsigned long dt)
         }
     }
 
-    draw_grid(display_grid, 10, 0);
+    */
+
+    grid.draw(arduboy, 10, 0);
 
     arduboy.display();
 }
@@ -113,8 +68,6 @@ void setup()
 
     current_actor.position = { 0, 0 };
     current_actor.tetromino = &SquareBlock;
-
-    memset(&the_grid, 0, GRID_SIZE);
 }
 
 void loop()
