@@ -41,13 +41,14 @@ void InputHandler::handle_input(Arduboy& adb)
 
         bool down = adb.pressed(button);
 
-        if (down != last_state) {
-            if ( (now - last_time) > repeat_rate ) {
-                button_handler(button, down);
+        if (down || down != last_state) {
+            if ( (now - last_time) > repeat_rate || down != last_state ) {
+                if (button_handler) button_handler(button, down);
 
-                _last_seen_state[button_idx] = down;
                 _last_seen_time[button_idx] = now;
             }
+
+            _last_seen_state[button_idx] = down;
         }
     }
 

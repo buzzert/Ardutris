@@ -2,7 +2,7 @@
 
 Grid::Grid()
 {
-    memset(_data, 0, GRID_SIZE);
+    memset(_data, 0, sizeof(int) * GRID_SIZE);
 }
 
 void Grid::draw(Arduboy& adb, const unsigned x, const unsigned y)
@@ -31,4 +31,9 @@ void Grid::draw(Arduboy& adb, const unsigned x, const unsigned y)
         GRID_ROWS * (SHAPE_BLOCK_WIDTH + SHAPE_BLOCK_PADDING) + 1,
         BLACK
     );
+}
+
+void Grid::copy(Grid &other_grid)
+{
+    memcpy(_data, other_grid._data, sizeof(int) * GRID_SIZE);
 }

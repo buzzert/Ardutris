@@ -26,6 +26,7 @@ public:
         _data[(y * GRID_COLS) + x] = val;
     }
 
+    void copy(Grid &other_grid);
     void draw(Arduboy& adb, const unsigned x, const unsigned y);
 
 private:
