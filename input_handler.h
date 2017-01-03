@@ -14,7 +14,7 @@ public:
     // Call this in the main runloop
     void handle_input(Arduboy& adb);
 
-    unsigned long repeat_rate = 100;
+    unsigned long repeat_rate = 200;
     void(*button_handler)(uint8_t button, bool down) = NULL;
 
 private:

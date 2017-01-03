@@ -1,68 +1,99 @@
 #ifndef SHAPES_H
 #define SHAPES_H
 
-#include <Arduino.h>
+#include "utils.h"
 
 typedef struct {
-    unsigned int cols;
-    unsigned int rows;
+    unsigned int width;
+    unsigned int height;
 
-    const char *shape_data;
+    int shape_data[];
+
+    int at(unsigned int x, unsigned int y) {
+        if (x >= width) return 0;
+        if (y >= height) return 0;
+        
+        return shape_data[y * width + x];
+    }
 } tetromino_t;
 
 static tetromino_t SquareBlock = {
-    .cols = 2,
-    .rows = 2,
-    .shape_data = "xxxx"
+    .width = 2,
+    .height = 2,
+    .shape_data = {
+        1, 1,
+        1, 1
+    },
 };
 
 static tetromino_t LeftLBlock = {
-    .cols = 2,
-    .rows = 3,
-    .shape_data = "x x xx"
+    .width = 2,
+    .height = 3,
+    .shape_data = {
+        1, 0,
+        1, 0,
+        1, 1,
+    },
 };
 
 static tetromino_t RightLBlock = {
-    .cols = 2,
-    .rows = 3,
-    .shape_data = " x x xx"
+    .width = 2,
+    .height = 3,
+    .shape_data = {
+        0, 1,
+        0, 1,
+        1, 1,
+    },
 };
 
 static tetromino_t LongBlock = {
-    .cols = 1,
-    .rows = 4,
-    .shape_data = "xxxx"
+    .width = 1,
+    .height = 4,
+    .shape_data = {
+        1,
+        1,
+        1,
+        1,
+    },
 };
 
 static tetromino_t MountainBlock = {
-    .cols = 3,
-    .rows = 2,
-    .shape_data = " x xxx"
+    .width = 3,
+    .height = 2,
+    .shape_data = {
+        0, 1, 0,
+        1, 1, 1,
+    },
 };
 
 static tetromino_t ZBlock = {
-    .cols = 3,
-    .rows = 2,
-    .shape_data = "xx xxx"
+    .width = 3,
+    .height = 2,
+    .shape_data = {
+        1, 1, 0,
+        0, 1, 1,
+    },
 };
 
 static tetromino_t SBlock = {
-    .cols = 3,
-    .rows = 2,
-    .shape_data = " xxxx "
+    .width = 3,
+    .height = 2,
+    .shape_data = {
+        0, 1, 1,
+        1, 1, 0,
+    },
 };
 
-typedef struct
-{
-    int16_t x;
-    int16_t y;
-} point_t;
-
-struct shape_actor
+struct shape_actor_t
 {
 public:
     point_t      position;
     tetromino_t *tetromino;
+    int          rotation = 0;
+
+    shape_actor_t() {};
+    shape_actor_t(const shape_actor_t& a)
+        : position(a.position), tetromino(a.tetromino), rotation(a.rotation) {};
 };
 
 #endif
