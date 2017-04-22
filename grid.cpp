@@ -42,43 +42,17 @@ void Grid::commit_actor(const shape_actor_t& actor)
 {
     tetromino_t *tetromino = actor.tetromino;
 
-    int width = tetromino->width;
-    int height = tetromino->height;
-
-    bool rotated = (actor.rotation + 1) % 2 == 0;
-
-    int n = width > height ? width : height;
-
-    // Convert to NxN 2D array
-    int block[n][n];
-    memset(&block, 0, sizeof(int) * n * n);
-
-    for (int y = 0; y < n; y++) {
-        for (int x = 0; x < n; x++) {
-            block[x][y] = tetromino->at(x, y);
-        }
-    }
+    int width = 4;
+    int height = 4;
 
     // Rotate if necessary
-    for (int deg = 0; deg < (actor.rotation % 4); deg++) {
-        int translated_block[n][n];
-        memset(&translated_block, 0, sizeof(int) * n * n);
-        for (int y = 0; y < n; y++) {
-            for (int x = 0; x < n; x++) {
-                int xpos = n - 1 - y;
-                int ypos = x;
-
-                translated_block[x][y] = block[xpos][ypos];
-            }
-        }
-
-        memcpy(&block, &translated_block, sizeof(int) * n * n);
-    }
+    int block[16] = { 0 };
+    tetromino->rotated_shape_data(actor.rotation, &block);
 
     // Blit to grid
-    for (int y = 0; y < n; y++) {
-        for (int x = 0; x < n; x++) {
-            if (block[x][y]) {
+    for (int y = 0; y < height; y++) {
+        for (int x = 0; x < width; x++) {
+            if (block[4 * y + x]) {
                 set(actor.position.x + x, actor.position.y + y, 1);
             }
         }

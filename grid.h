@@ -12,7 +12,7 @@
 #define SHAPE_BLOCK_WIDTH 3
 
 #define GRID_HEIGHT 15
-#define GRID_WIDTH 16
+#define GRID_WIDTH 10
 #define GRID_SIZE (GRID_HEIGHT * GRID_WIDTH)
 
 class Grid

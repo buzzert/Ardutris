@@ -16,7 +16,10 @@ static InputHandler input_handler;
 static unsigned long time_started;
 static unsigned long last_update;
 
-static unsigned long block_speed = 1;
+static const unsigned long kDroppingBlockSpeed = 6.0;
+static const unsigned long kFallingBlockSpeed = 1.0;
+
+static unsigned long block_speed = kFallingBlockSpeed;
 
 tetromino_t* random_tetromino()
 {
@@ -68,16 +71,25 @@ void button_handler(uint8_t button, bool down)
         ghost_actor.position.x -= 1;
     }
 
-    if (down && button == DOWN_BUTTON) {
-        ghost_actor.position.y += 1;
+    if (down && button == A_BUTTON) {
+        ghost_actor.rotation += 1;
     }
 
-    if (down && button == A_BUTTON) {
-        current_actor.rotation += 1;
+    if (down && button == B_BUTTON) {
+        ghost_actor.rotation -= 1;
+    }
+
+    if (button == DOWN_BUTTON) {
+        if (down) {
+            block_speed = kDroppingBlockSpeed;
+        } else {
+            block_speed = kFallingBlockSpeed;
+        }
     }
 
     if (grid.actor_in_horiz_bounds(ghost_actor)) {
         current_actor.position = ghost_actor.position;
+        current_actor.rotation = ghost_actor.rotation;
     }
 }
 
@@ -106,7 +118,7 @@ void draw(unsigned long dt)
     // Put current actor onto the display grid
     display_grid.commit_actor(current_actor);
 
-    display_grid.draw(arduboy, 10, 0);
+    display_grid.draw(arduboy, 20, 0);
 
     arduboy.display();
 }
