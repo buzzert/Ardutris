@@ -4,7 +4,7 @@
 
 Grid::Grid()
 {
-    memset(_data, 0, sizeof(int) * GRID_SIZE);
+    reset();
 }
 
 void Grid::draw(Arduboy& adb, const unsigned at_x, const unsigned at_y)
@@ -128,4 +128,9 @@ unsigned int Grid::clear_lines()
     }
 
     return lines_cleared;
+}
+
+void Grid::reset()
+{
+    memset(_data, 0, sizeof(int) * GRID_SIZE);
 }

@@ -25,6 +25,7 @@ static const unsigned int kLineClearScoreVal = 10;
 static unsigned long block_speed = kFallingBlockSpeed;
 
 static unsigned int current_score = 0;
+bool game_over = false;
 
 tetromino_t* random_tetromino()
 {
@@ -43,6 +44,16 @@ tetromino_t* random_tetromino()
     return tetrominos[random_idx];
 }
 
+void restart_game()
+{
+    current_score = 0;
+    game_over = false;
+    grid.reset();
+
+    current_actor.position = { 5, 0 };
+    current_actor.tetromino = random_tetromino();
+}
+
 void next_block()
 {
     grid.commit_actor(current_actor);
@@ -55,6 +66,10 @@ void next_block()
     current_actor.position = { 5, 0 };
     current_actor.tetromino = random_tetromino();
     current_actor.rotation = 0;
+
+    if (grid.actor_collides(current_actor)) {
+        game_over = true;
+    }
 }
 
 void move_current_block_down()
@@ -71,6 +86,11 @@ void move_current_block_down()
 
 void button_handler(uint8_t button, bool down)
 {
+    if (down && game_over) {
+        restart_game();
+        return;
+    }
+
     shape_actor_t ghost_actor(current_actor);
 
     if (down && button == RIGHT_BUTTON) {
@@ -124,19 +144,28 @@ void draw_hud(int16_t xpos, int16_t ypos)
     char scoreString[16];
     sprintf(scoreString, "%u", current_score);
     arduboy.print(scoreString);
+
+    if (game_over) {
+        ypos += kLineHeight * 2;
+        arduboy.setCursor(xpos, ypos);
+
+        arduboy.print("GAME OVER");
+    }
 }
 
 void update(unsigned long dt)
 {
     input_handler.handle_input(arduboy);
 
-    unsigned long now = millis();
-    static unsigned long last_movement = 0;
-    if ( (now - last_movement) > (1000 / block_speed) ) {
-        // Every second, move interactive actor down by one block
-        move_current_block_down();
+    if (!game_over) {
+        unsigned long now = millis();
+        static unsigned long last_movement = 0;
+        if ( (now - last_movement) > (1000 / block_speed) ) {
+            // Every second, move interactive actor down by one block
+            move_current_block_down();
 
-        last_movement = now;
+            last_movement = now;
+        }
     }
 }
 
@@ -170,8 +199,7 @@ void setup()
 
     input_handler.button_handler = button_handler;
 
-    current_actor.position = { 5, 0 };
-    current_actor.tetromino = &MountainBlock; //random_tetromino();
+    restart_game();
 }
 
 void loop()

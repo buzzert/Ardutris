@@ -40,6 +40,8 @@ public:
     /// Returns number of lines cleared
     unsigned int clear_lines();
 
+    void reset();
+
 private:
     int _data[GRID_SIZE];
 
