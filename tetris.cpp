@@ -19,7 +19,12 @@ static unsigned long last_update;
 static const unsigned long kDroppingBlockSpeed = 12.0;
 static const unsigned long kFallingBlockSpeed = 1.0;
 
+static const unsigned int kBlockDropScoreVal = 5;
+static const unsigned int kLineClearScoreVal = 10;
+
 static unsigned long block_speed = kFallingBlockSpeed;
+
+static unsigned int current_score = 0;
 
 tetromino_t* random_tetromino()
 {
@@ -42,6 +47,11 @@ void next_block()
 {
     grid.commit_actor(current_actor);
 
+    unsigned int lines_cleared = grid.clear_lines();
+
+    current_score += kBlockDropScoreVal;
+    current_score += lines_cleared * kLineClearScoreVal;
+
     current_actor.position = { 5, 0 };
     current_actor.tetromino = random_tetromino();
     current_actor.rotation = 0;
@@ -52,7 +62,7 @@ void move_current_block_down()
     shape_actor_t ghost_actor(current_actor);
     ghost_actor.position.y += 1;
 
-    if (!grid.actor_in_vert_bounds(ghost_actor) || grid.actor_collides(ghost_actor)) {
+    if (grid.actor_collides(ghost_actor)) {
         next_block();
     } else {
         current_actor.position = ghost_actor.position;
@@ -72,11 +82,11 @@ void button_handler(uint8_t button, bool down)
     }
 
     if (down && button == A_BUTTON) {
-        ghost_actor.rotation += 1;
+        ghost_actor.rotation -= 1;
     }
 
     if (down && button == B_BUTTON) {
-        ghost_actor.rotation -= 1;
+        ghost_actor.rotation += 1;
     }
 
     if (button == DOWN_BUTTON) {
@@ -91,6 +101,27 @@ void button_handler(uint8_t button, bool down)
         current_actor.position = ghost_actor.position;
         current_actor.rotation = ghost_actor.rotation;
     }
+}
+
+void draw_hud(int16_t xpos, int16_t ypos)
+{
+    arduboy.setTextSize(1);
+    arduboy.setCursor(xpos, ypos);
+
+    arduboy.print("Ardutris");
+
+    ypos += 8 + 4;
+    arduboy.setCursor(xpos, ypos);
+
+    const char *scoreText = "SCORE: ";
+    arduboy.print(scoreText);
+
+    ypos += 8;
+    arduboy.setCursor(xpos, ypos);
+
+    char scoreString[16];
+    sprintf(scoreString, "%u", current_score);
+    arduboy.print(scoreString);
 }
 
 void update(unsigned long dt)
@@ -110,7 +141,7 @@ void update(unsigned long dt)
 void draw(unsigned long dt)
 {
     arduboy.clear();
-    arduboy.fillScreen(WHITE);
+    arduboy.fillScreen(BLACK);
 
     Grid display_grid;
     display_grid.copy(grid);
@@ -119,6 +150,8 @@ void draw(unsigned long dt)
     display_grid.commit_actor(current_actor);
 
     display_grid.draw(arduboy, 20, 2);
+
+    draw_hud(65, 5);
 
     arduboy.display();
 }
@@ -136,7 +169,7 @@ void setup()
     input_handler.button_handler = button_handler;
 
     current_actor.position = { 5, 0 };
-    current_actor.tetromino = &MountainBlock; //random_tetromino();
+    current_actor.tetromino = &SBlock; //random_tetromino();
 }
 
 void loop()

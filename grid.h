@@ -37,10 +37,13 @@ public:
     bool actor_collides(const shape_actor_t& actor);
     void commit_actor(const shape_actor_t& actor);
 
-    bool actor_in_vert_bounds(const shape_actor_t& actor);
+    /// Returns number of lines cleared
+    unsigned int clear_lines();
 
 private:
     int _data[GRID_SIZE];
+
+    void _shift_down(unsigned int from_line);
 };
 
 #endif

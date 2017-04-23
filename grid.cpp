@@ -9,6 +9,11 @@ Grid::Grid()
 
 void Grid::draw(Arduboy& adb, const unsigned at_x, const unsigned at_y)
 {
+    unsigned int bounds_width  = width()  * (SHAPE_BLOCK_WIDTH + SHAPE_BLOCK_PADDING) + 1;
+    unsigned int bounds_height = height() * (SHAPE_BLOCK_WIDTH + SHAPE_BLOCK_PADDING) + 1;
+
+    adb.fillRect(at_x, at_y, bounds_width, bounds_height, WHITE);
+
     const int16_t frame_width = 1;
 
     int16_t x_offset = at_x + frame_width;
@@ -34,11 +39,7 @@ void Grid::draw(Arduboy& adb, const unsigned at_x, const unsigned at_y)
     }
 
     // Frame
-    adb.drawRect(at_x, at_y,
-        width()  * (SHAPE_BLOCK_WIDTH + SHAPE_BLOCK_PADDING) + 1,
-        height() * (SHAPE_BLOCK_WIDTH + SHAPE_BLOCK_PADDING) + 1,
-        BLACK
-    );
+    adb.drawRect(at_x, at_y, bounds_width, bounds_height, WHITE);
 }
 
 void Grid::copy(Grid &other_grid)
@@ -58,6 +59,8 @@ void Grid::commit_actor(const shape_actor_t& actor)
     // Blit to grid
     for (int y = 0; y < SHAPE_BOUNDS_HEIGHT; y++) {
         for (int x = 0; x < SHAPE_BOUNDS_WIDTH; x++) {
+            if (AT(x, y) < 0) continue;
+
             if (block[AT(x, y)]) {
                 set(position.x + x, position.y + y, 1);
             }
@@ -85,7 +88,9 @@ bool Grid::actor_collides(const shape_actor_t& actor)
             int16_t x_pos = position.x + x;
             int16_t y_pos = position.y + y;
 
-            if (block[AT(x, y)] && (at(x_pos, y_pos) || (x_pos < 0) || (x_pos >= width()))) {
+            if (AT(x, y) < 0) continue;
+
+            if (block[AT(x, y)] && ( at(x_pos, y_pos) || (x_pos < 0) || (x_pos >= width()) || (y_pos >= height()) )) {
                 collides = true;
                 break;
             }
@@ -95,14 +100,32 @@ bool Grid::actor_collides(const shape_actor_t& actor)
     return collides;
 }
 
-bool Grid::actor_in_vert_bounds(const shape_actor_t& actor)
+void Grid::_shift_down(unsigned int from_line)
 {
-    int actor_height = actor.tetromino->height;
-    if (actor.rotation % 2) {
-        actor_height = actor.tetromino->width;
+    for (int y = from_line; y > 0; y--) {
+        for (int x = 0; x < width(); x++) {
+            int val = 0;
+            if ( (y - 1) >= 0 ) {
+                val = at(x, y - 1);
+            }
+
+            set(x, y, val);
+        }
+    }
+}
+
+unsigned int Grid::clear_lines()
+{
+    unsigned int lines_cleared = 0;
+    for (int y = 0; y < height(); y++) {
+        unsigned int line_sum = 0;
+        for (int x = 0; x < width(); x++) if (at(x, y)) line_sum++;
+
+        if (line_sum == width()) {
+            _shift_down(y);
+            lines_cleared++;
+        }
     }
 
-    if (actor.position.y + actor_height > height()) return false;
-
-    return true;
+    return lines_cleared;
 }
