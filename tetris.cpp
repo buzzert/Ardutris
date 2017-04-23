@@ -105,18 +105,20 @@ void button_handler(uint8_t button, bool down)
 
 void draw_hud(int16_t xpos, int16_t ypos)
 {
+    const unsigned int kLineHeight = 8;
+
     arduboy.setTextSize(1);
     arduboy.setCursor(xpos, ypos);
 
     arduboy.print("Ardutris");
 
-    ypos += 8 + 4;
+    ypos += kLineHeight + 8;
     arduboy.setCursor(xpos, ypos);
 
-    const char *scoreText = "SCORE: ";
+    const char *scoreText = "SCORE";
     arduboy.print(scoreText);
 
-    ypos += 8;
+    ypos += kLineHeight;
     arduboy.setCursor(xpos, ypos);
 
     char scoreString[16];
@@ -169,7 +171,7 @@ void setup()
     input_handler.button_handler = button_handler;
 
     current_actor.position = { 5, 0 };
-    current_actor.tetromino = &SBlock; //random_tetromino();
+    current_actor.tetromino = &MountainBlock; //random_tetromino();
 }
 
 void loop()

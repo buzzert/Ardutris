@@ -5,7 +5,12 @@ point_t tetromino_t::rotated_shape_data(const int rotation, int (*result_shape_d
     memcpy(result_shape_data, &shape_data, sizeof(int) * SHAPE_SIZE);
 
     int translated_block[SHAPE_SIZE];
-    int normalized_rotation = (abs(rotation) % 4);
+
+    int normalized_rotation = rotation;
+    if (normalized_rotation < 0) {
+        normalized_rotation = 4 - -(normalized_rotation % 4);
+    }
+
     for (int deg = 0; deg < normalized_rotation; deg++) {
         for (int y = 0; y < SHAPE_BOUNDS_HEIGHT; y++) {
             for (int x = 0; x < SHAPE_BOUNDS_WIDTH; x++) {
