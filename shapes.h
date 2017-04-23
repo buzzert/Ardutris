@@ -16,7 +16,8 @@ struct tetromino_t {
         return shape_data[4 * y + x];
     }
 
-    void rotated_shape_data(const int rotation, int (*result_shape_data)[16]);
+    // returns rotated position offset
+    point_t rotated_shape_data(const int rotation, int (*result_shape_data)[16]);
 };
 
 static tetromino_t SquareBlock = {

@@ -15,10 +15,15 @@ public:
 };
 
 
-typedef struct
+struct point_t
 {
     int16_t x;
     int16_t y;
-} point_t;
+
+    point_t offset_by(point_t offset) const
+    {
+        return { (x - offset.x), (y - offset.y) };
+    }
+};
 
 #endif
