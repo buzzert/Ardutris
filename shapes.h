@@ -3,17 +3,23 @@
 
 #include "utils.h"
 
+#define SHAPE_BOUNDS_WIDTH  4
+#define SHAPE_BOUNDS_HEIGHT 4
+#define SHAPE_SIZE (SHAPE_BOUNDS_HEIGHT * SHAPE_BOUNDS_WIDTH)
+
+#define AT(x, y) (SHAPE_BOUNDS_WIDTH * y + x)
+
 struct tetromino_t {
     unsigned int width;
     unsigned int height;
 
-    int shape_data[4 * 4];
+    int shape_data[SHAPE_SIZE];
 
     int at(unsigned int x, unsigned int y) {
         if (x >= width) return 0;
         if (y >= height) return 0;
 
-        return shape_data[4 * y + x];
+        return shape_data[AT(x, y)];
     }
 
     // returns rotated position offset

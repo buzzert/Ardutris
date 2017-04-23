@@ -2,39 +2,33 @@
 
 point_t tetromino_t::rotated_shape_data(const int rotation, int (*result_shape_data)[16])
 {
-    const int n = 4;
-    int block[16] = { 0 };
-    memcpy(&block, &shape_data, sizeof(int) * 16);
+    memcpy(result_shape_data, &shape_data, sizeof(int) * SHAPE_SIZE);
 
-    int block_width = width;
-    int block_height = height;
-
-    point_t offset = { 0, 0 };
+    int translated_block[SHAPE_SIZE];
     int normalized_rotation = (abs(rotation) % 4);
     for (int deg = 0; deg < normalized_rotation; deg++) {
-        int translated_block[n * n];
-        memset(&translated_block, 0, sizeof(int) * n * n);
-
-        for (int y = 0; y < n; y++) {
-            for (int x = 0; x < n; x++) {
-                int xpos = n - 1 - y;
+        for (int y = 0; y < SHAPE_BOUNDS_HEIGHT; y++) {
+            for (int x = 0; x < SHAPE_BOUNDS_WIDTH; x++) {
+                int xpos = SHAPE_BOUNDS_WIDTH - 1 - y;
                 int ypos = x;
 
-                translated_block[4 * y + x] = block[4 * ypos + xpos];
+                translated_block[AT(x, y)] = (*result_shape_data)[AT(xpos, ypos)];
             }
         }
 
-        memcpy(&block, &translated_block, sizeof(int) * n * n);
+        memcpy(result_shape_data, &translated_block, sizeof(int) * SHAPE_SIZE);
     }
 
-    memcpy(result_shape_data, &block, sizeof(int) * n * n);
+    point_t offset = { 0,  0 };
+    if (normalized_rotation >= 2) {
+        // Quadrants I and IV will have space on the left
+        offset.x = (SHAPE_BOUNDS_WIDTH - width);
+    }
 
-    // too tired...
-    const int width_offset_val = 4 - width;
-    int offset_table_x[] = { 0, 0, width_offset_val, width_offset_val };
+    if (normalized_rotation > 0 && normalized_rotation < 3) {
+        // Quadrants III and IV will have space on top
+        offset.y = (SHAPE_BOUNDS_HEIGHT - height);
+    }
 
-    const int height_offset_val = 4 - height;
-    int offset_table_y[] = { 0, height_offset_val, height_offset_val, 0 };
-
-    return { offset_table_x[normalized_rotation], offset_table_y[normalized_rotation] };
+    return offset;
 }

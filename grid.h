@@ -37,11 +37,7 @@ public:
     bool actor_collides(const shape_actor_t& actor);
     void commit_actor(const shape_actor_t& actor);
 
-    bool actor_in_horiz_bounds(const shape_actor_t& actor);
     bool actor_in_vert_bounds(const shape_actor_t& actor);
-    bool actor_in_bounds(const shape_actor_t& actor) {
-        return actor_in_horiz_bounds(actor) && actor_in_vert_bounds(actor);
-    }
 
 private:
     int _data[GRID_SIZE];
